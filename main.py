@@ -27,10 +27,15 @@ class NeteaseMusicParser(Star):
             # **拼接文本**
             result_text = f"解析结果：id={song_id}, userid={user_id}, dlt={dlt}"
 
-            # **创建消息节点**
-            nodes = Nodes([Node(uin=event.get_self_id(), name="MusicParserBot", content=[Plain(result_text)])])
+            try:
+                # 尝试将 event.get_self_id() 的返回值转换为整数
+                uin = int(event.get_self_id())
+                # **创建消息节点**
+                nodes = Nodes([Node(uin=uin, name="MusicParserBot", content=[Plain(result_text)])])
 
-            # **发送消息**
-            yield event.chain_result([nodes])
+                # **发送消息**
+                yield event.chain_result([nodes])
+            except ValueError:
+                logger.error(f"无法将 event.get_self_id() 的返回值 {event.get_self_id()} 转换为整数。")
         else:
             logger.error("❌ 解析网易云音乐链接失败")
